@@ -1,24 +1,24 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"net/http"
 	"net/http/httputil"
+	"os"
 )
 
 func main() {
-	var addr = flag.String("addr", ":8080", "HTTP listening address")
-	flag.Parse()
-	log.Fatal(http.ListenAndServe(*addr, http.HandlerFunc(h)))
-}
-
-func h(w http.ResponseWriter, r *http.Request) {
-	b, err := httputil.DumpRequest(r, true)
-	if err != nil {
-		log.Print(err)
-		return
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
 	}
-	fmt.Println(string(b))
+	log.Fatal(http.ListenAndServe(":"+port, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		b, err := httputil.DumpRequest(r, true)
+		if err != nil {
+			log.Print(err)
+			return
+		}
+		fmt.Println(string(b))
+	})))
 }
